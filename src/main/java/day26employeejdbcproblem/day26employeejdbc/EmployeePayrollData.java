@@ -58,23 +58,11 @@ public class EmployeePayrollData {
 		this.start = start;
 	}
 	
-
+	@Override
 	public String toString() {
 		return "Employee ID = " + id + ","+"Emp_Name = " + name + "," + " Emp_Salary = "+", " + salary + ","+" Gender = " + gender+","
 				+ " Start = " + start ;
 	}
 	
-	
-	public boolean equals(Object obj) {
-		if(this.equals(obj)) return true;
-		if(obj==null||getClass()!=obj.getClass())
-			 return false;
-		EmployeePayrollData epmData=(EmployeePayrollData) obj;
-		return (id== epmData.id &&
-				Double.compare(epmData.salary, salary)==0 &&
-				name.equals(epmData.name));		
-	
-		}
 
 }
-

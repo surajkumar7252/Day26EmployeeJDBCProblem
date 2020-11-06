@@ -1,6 +1,7 @@
 package day26employeejdbcproblem.day26employeejdbc;
 
 
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -20,6 +21,14 @@ public class EmployeePayrollService {
 	public Connection connection;
 	public Statement statementOpted;
 	public ResultSet resultSetOpted;
+
+	public static void main(String[] args) throws EmployeePayrollServiceException, SQLException {
+		employeePayrollService.connectingToDatabase();
+		employeePayrollService.readEmployeePayrollData();
+		employeePayrollService.updateEmployeePayrollDataUsingStatement("SURAJ", 950000.00);
+		employeePayrollService.readEmployeePayrollDataFromDataBase("SURAJ");
+
+	}
 
 	public Connection connectingToDatabase() throws EmployeePayrollServiceException {
 
@@ -48,20 +57,21 @@ public class EmployeePayrollService {
 	}
 
 	public List<EmployeePayrollData> readEmployeePayrollData() throws EmployeePayrollServiceException, SQLException {
-		String query = "select * from employee_payroll";
 		List<EmployeePayrollData> employeePayrollDataList = new ArrayList<EmployeePayrollData>();
+		String query = "select * from employee_payroll";
+
 		try {
 			connection = this.connectingToDatabase();
 			statementOpted = connection.createStatement();
 			resultSetOpted = statementOpted.executeQuery(query);
 			do {
-				Integer id = resultSetOpted.getInt("id");
-				String name = resultSetOpted.getString("name");
-				String gender = resultSetOpted.getString("gender");
-				Double salary = resultSetOpted.getDouble("salary");
-				LocalDate start = resultSetOpted.getDate("start").toLocalDate();
-				employeePayrollDataList.add(new EmployeePayrollData(id, name,  gender,salary, start));
-			}while (resultSetOpted.next());
+				Integer id = resultSetOpted.getInt("ID");
+				String name = resultSetOpted.getString("NAME");
+				String gender = resultSetOpted.getString("GENDER");
+				Double salary = resultSetOpted.getDouble("SALARY");
+				LocalDate start = resultSetOpted.getDate("START").toLocalDate();
+				employeePayrollDataList.add(new EmployeePayrollData(id, name, gender, salary, start));
+			} while (resultSetOpted.next());
 
 		} catch (SQLException e) {
 			throw new EmployeePayrollServiceException("Reading Error.");
@@ -73,6 +83,49 @@ public class EmployeePayrollService {
 
 	}
 
+	private void updateEmployeePayrollDataUsingStatement(String name, Double salary)
+			throws EmployeePayrollServiceException, SQLException {
+		String query = String.format("update emplyee_Payroll set salary=950000.00f where name='SURAJ'", salary, name);
+		try {
+			connection = this.connectingToDatabase();
+			statementOpted = connection.createStatement();
+			Integer updateApplied = statementOpted.executeUpdate(query);
+			log.info(" Updations: " + updateApplied);
+		} catch (SQLException e) {
+			throw new EmployeePayrollServiceException("Updation Failed");
+
+		} finally {
+			if (connection != null)
+				connection.close();
+		}
+	}
+
+	public List<EmployeePayrollData> readEmployeePayrollDataFromDataBase(String name)
+			throws EmployeePayrollServiceException, SQLException {
+		List<EmployeePayrollData> employeePayrollList = new ArrayList<EmployeePayrollData>();
+		String query = String.format("select * from employee_payroll where name='%s'", name);
+		try {
+			connection = this.connectingToDatabase();
+			statementOpted = connection.createStatement();
+			resultSetOpted = statementOpted.executeQuery(query);
+			do {
+				Integer idOfEmployee = resultSetOpted.getInt("ID");
+				String nameOfEmployee = resultSetOpted.getString("NAME");
+				String genderOfEmployee = resultSetOpted.getString("GENDER");
+				Double salaryOfEmployee = resultSetOpted.getDouble("SALARY");
+				LocalDate startDateOfEmployee = resultSetOpted.getDate("START").toLocalDate();
+				employeePayrollList.add(new EmployeePayrollData(idOfEmployee, nameOfEmployee, genderOfEmployee,
+						salaryOfEmployee, startDateOfEmployee));
+			} while (resultSetOpted.next());
+			return employeePayrollList;
+		} catch (SQLException e) {
+			throw new EmployeePayrollServiceException("Reading Error");
+		} finally {
+			if (connection != null)
+				connection.close();
+		}
+	}
+
 	private static void listDrivers() {
 		Enumeration<java.sql.Driver> driverList = DriverManager.getDrivers();
 		while (driverList.hasMoreElements()) {
@@ -82,10 +135,5 @@ public class EmployeePayrollService {
 		}
 
 	}
-	
-    public static void main(String[] args) throws EmployeePayrollServiceException, SQLException {
-		employeePayrollService.connectingToDatabase();
-		employeePayrollService.readEmployeePayrollData();
-		
-	}
+
 }
