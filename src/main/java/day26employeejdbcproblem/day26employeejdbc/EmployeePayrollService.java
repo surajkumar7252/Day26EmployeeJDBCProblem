@@ -179,7 +179,7 @@ public class EmployeePayrollService {
 }
 	
 	public boolean checkSyncWithDB(String name) throws EmployeePayrollServiceException, SQLException {
-		List<EmployeePayrollData> employeePayrollData=employeePayrollService.employeePayrollService.readEmployeePayrollDataFromDataBase(name);
+		List<EmployeePayrollData> employeePayrollData=employeePayrollService.readEmployeePayrollDataFromDataBase(name);
 		return employeePayrollData.get(0).equals(employeePayrollDBList.stream()
 				.filter(employeePayrollObject->employeePayrollObject.getName().equals(name))
 				.findFirst().orElse(null));
@@ -345,6 +345,22 @@ public class EmployeePayrollService {
  		
  }
      
+     public void deleteEmployeeDetails(String name) throws EmployeePayrollServiceException, SQLException {
+ 		List<EmployeePayrollData> employeeToDeleteDetails = employeePayrollService.readEmployeePayrollDataFromDataBase(name);
+ 		String query = String.format("update employee set is_active=0 where EMP_NAME='%s' and is_active",name);
+ 		try {
+ 			connection=employeePayrollService.connectingToDatabase();
+ 			statementOpted=connection.createStatement();
+ 			statementOpted.executeQuery(query);
+ 		    employeeToDeleteDetails.forEach(employeePayrollData  -> employeePayrollService.employeePayrollDBList.remove(employeePayrollData ));
+ 	}catch(SQLException e) {
+			throw new EmployeePayrollServiceException("Deletion Failed");
+		}
+	 finally {
+		if (connection != null)
+			connection.close();
+	}
      
-   
+     
+     } 
 }
