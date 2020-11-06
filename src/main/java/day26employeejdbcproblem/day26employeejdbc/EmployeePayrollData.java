@@ -19,7 +19,14 @@ public class EmployeePayrollData {
 		this.start=start;	
 	}
 	
-    public Integer getId() {
+    public EmployeePayrollData(Integer id, String name, String gender, Double salary) {
+    	this.id = id;
+		this.name = name;
+		this.salary = salary;
+		this.gender = gender;
+	}
+
+	public Integer getId() {
 		return id;
 	}
 

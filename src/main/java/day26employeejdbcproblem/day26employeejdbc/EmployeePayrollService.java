@@ -283,7 +283,7 @@ public class EmployeePayrollService {
 
 
      public void addEmployeeToPayrollDB(String name, String gender, Double salary, LocalDate startDate) throws EmployeePayrollServiceException, SQLException {
-    	  
+    	 EmployeePayrollData employeePayrollData;
     	 String query1 = String.format("insert into employee_payroll (NAME,GENDER,SALARY,STARTDATE) values ('%s','%s',%f,'%s')",name, gender, salary, startDate);
 		try {
 			connection=employeePayrollService.connectingToDatabase();
@@ -291,6 +291,7 @@ public class EmployeePayrollService {
 			statementOpted = connection.createStatement();
 			 resultSetOpted = statementOpted.executeQuery(query1);			 
 			log.info("Addition Complete");
+			
 			Integer objectId = resultSetOpted.getInt("ID");
 			Double BASIC_PAY = salary;
 			Double DEDUCTIONS = 0.2 * BASIC_PAY;
@@ -302,10 +303,12 @@ public class EmployeePayrollService {
 					DEDUCTIONS, TAXABLE_PAY, INCOME_TAX, NET_PAY);
 			Statement statement = connection.createStatement();
 			statement.executeQuery(query2);	
+			employeePayrollData = new EmployeePayrollData(objectId, name, gender, salary);
 			connection.commit();
 			
 				} catch (SQLException e) {
-			throw new EmployeePayrollServiceException("Adding Details Failed");
+					connection.rollback();
+					throw new EmployeePayrollServiceException("Adding Details Failed");
 		}
 		finally {
 			if (connection != null)
