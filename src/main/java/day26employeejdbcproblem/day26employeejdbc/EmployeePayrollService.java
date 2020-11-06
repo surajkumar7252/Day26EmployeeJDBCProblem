@@ -47,6 +47,7 @@ public class EmployeePayrollService {
 		startDate=LocalDate.of(2017, 1, 13);
 		employeePayrollService.getEmployeePayrollDataByDateOfStarting(startDate, LocalDate.now());
 		employeePayrollService.makeComputations(TypeOfCalculation.AVG);
+		employeePayrollService.addEmployeeToPayrollDB("SURAJ","M",950000.00,startDate);
 		
 
 	}
@@ -279,5 +280,28 @@ public class EmployeePayrollService {
 		}
 	}
 
+
+     public void addEmployeeToPayrollDB(String name, String gender, Double salary, LocalDate startDate) throws EmployeePayrollServiceException, SQLException {
+    	  List<EmployeePayrollData>  employeePayrollAdditionList = new ArrayList<EmployeePayrollData>();
+    	 String query = String.format("insert into employee_payroll (NAME,GENDER,SALARY,STARTDATE) values ('%s','%s',%f,'%s')",name, gender, salary, startDate);
+		try {
+			connection=employeePayrollService.connectingToDatabase();
+			statementOpted = connection.createStatement();
+			 resultSetOpted = statementOpted.executeQuery(query);			 
+			log.info("Addition Complete");
+			Integer objectId = resultSetOpted.getInt("ID");
+			String objectName = resultSetOpted.getString("NAME");
+			String objectGender = resultSetOpted.getString("GENDER");
+			Double objectSalary = resultSetOpted.getDouble("SALARY");
+			LocalDate objectStart = resultSetOpted.getDate("START").toLocalDate();
+			employeePayrollAdditionList.add(new EmployeePayrollData(objectId, objectName, objectGender, objectSalary, objectStart));
+		} catch (SQLException e) {
+			throw new EmployeePayrollServiceException("Adding Data Failed");
+		}
+		finally {
+			if (connection != null)
+				connection.close();
+		}
+	}
 
 }
