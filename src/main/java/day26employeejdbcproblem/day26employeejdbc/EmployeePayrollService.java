@@ -48,7 +48,7 @@ public class EmployeePayrollService {
 		startDate=LocalDate.of(2017, 1, 13);
 		employeePayrollService.getEmployeePayrollDataByDateOfStarting(startDate, LocalDate.now());
 		employeePayrollService.makeComputations(TypeOfCalculation.AVG);
-		employeePayrollService.addEmployeeToPayrollDB("SURAJ","M",950000.00,startDate);
+		employeePayrollService.addEmployeeToPayrollDB("Capgemini","SURAJ", "M", 950000.00,startDate, "Dhanbad", "885522669933");
 		
 
 	}
@@ -282,17 +282,26 @@ public class EmployeePayrollService {
 	}
 
 
-     public void addEmployeeToPayrollDB(String name, String gender, Double salary, LocalDate startDate) throws EmployeePayrollServiceException, SQLException {
+     public void addEmployeeToPayrollDB(String company,String name, String gender, Double salary, LocalDate startDate, String address, String phone_number) throws EmployeePayrollServiceException, SQLException {
     	 EmployeePayrollData employeePayrollData;
     	 String query1 = String.format("insert into employee_payroll (NAME,GENDER,SALARY,STARTDATE) values ('%s','%s',%f,'%s')",name, gender, salary, startDate);
 		try {
-			connection=employeePayrollService.connectingToDatabase();
 			connection.setAutoCommit(false);
-			statementOpted = connection.createStatement();
-			 resultSetOpted = statementOpted.executeQuery(query1);			 
-			log.info("Addition Complete");
+			connection=employeePayrollService.connectingToDatabase();
+			String query01=String.format("select ORGANISATION_ID  from organisation where ORGANISATION_NAME ='%s'", company);
+			Statement statement01=connection.createStatement();
+			ResultSet resultSet01=statement01.executeQuery(query01);	
+			Integer org_Id = resultSet01.getInt("ORGANISATION_ID");
 			
-			Integer objectId = resultSetOpted.getInt("ID");
+			String query02=String.format("insert into organisation(ORGANISATION_NAME)  values ('%s')", company);
+			Statement statement02=connection.createStatement();
+			statement02.executeQuery(query02);	
+			
+			String query03=String.format("insert into employee (EMP_NAME ,GENDER,START ,ORGANISATION_ID , ADDRESS , PHONE_NUMBER ) values ('%s','%s','%s',%s,'%s','%s')",name, gender, startDate, org_Id, address, phone_number);
+			Statement statement03=connection.createStatement();
+			ResultSet resultSet03=statement03.executeQuery(query03);	
+			
+			Integer objectId = resultSet03.getInt("ID");
 			Double BASIC_PAY = salary;
 			Double DEDUCTIONS = 0.2 * BASIC_PAY;
 			Double TAXABLE_PAY = BASIC_PAY - DEDUCTIONS;
@@ -303,7 +312,7 @@ public class EmployeePayrollService {
 					DEDUCTIONS, TAXABLE_PAY, INCOME_TAX, NET_PAY);
 			Statement statement = connection.createStatement();
 			statement.executeQuery(query2);	
-			employeePayrollData = new EmployeePayrollData(objectId, name, gender, salary);
+			employeePayrollData = new EmployeePayrollData(company,objectId, name, gender, salary,startDate,address,phone_number);
 			connection.commit();
 			
 				} catch (SQLException e) {

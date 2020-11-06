@@ -11,6 +11,9 @@ public class EmployeePayrollData {
 	public Double salary;
 	public String gender;
 	public LocalDate start;
+	public String phone_number;
+	public String address;
+	public String company;
 	public EmployeePayrollData(Integer id, String name, String gender, Double salary,LocalDate start) {
 		this.id = id;
 		this.name = name;
@@ -25,6 +28,43 @@ public class EmployeePayrollData {
 		this.salary = salary;
 		this.gender = gender;
 	}
+
+	public EmployeePayrollData(String company, Integer id, String name, String gender, Double salary,
+			LocalDate startDate, String address, String phone_number) {
+		this.id = id;
+		this.company=company;
+		this.name = name;
+		this.salary = salary;
+		this.gender = gender;
+		this.start=startDate;
+		this.address=address;
+		this.phone_number=phone_number;
+	}
+	public String getPhone_number() {
+		return phone_number;
+	}
+
+	public void setPhone_number(String phone_number) {
+		this.phone_number = phone_number;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
+	}
+
+
 
 	public Integer getId() {
 		return id;
