@@ -325,6 +325,24 @@ public class EmployeePayrollService {
 		}
 	}
 
-     
-     
+     public void getDataFromDBAfterImplementingER(String name, Double salary) throws EmployeePayrollServiceException, SQLException {
+ 		
+ 		try {
+ 			connection=employeePayrollService.connectingToDatabase();
+ 			String query=" select GENDER,count(NET_PAY) from employee inner join payroll on employee.PERSONAL_ID=payroll.PERSONAL_ID  group by GENDER ";
+ 			statementOpted=connection.createStatement();
+ 			ResultSet resultSet=statementOpted.executeQuery(query);
+ 		    log.info(resultSet.getString("GENDER"));
+ 		    log.info(resultSet.getDouble("count(NET_PAY)"));
+ 			
+ 		}catch(SQLException e) {
+ 			throw new EmployeePayrollServiceException("Reading Data Failed");
+ 		}
+ 	 finally {
+ 		if (connection != null)
+ 			connection.close();
+ 	}
+ 		
+ }
+   
 }
