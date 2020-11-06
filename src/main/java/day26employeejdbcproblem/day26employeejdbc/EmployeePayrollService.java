@@ -81,7 +81,7 @@ public class EmployeePayrollService {
 
 	public List<EmployeePayrollData> readEmployeePayrollData() throws EmployeePayrollServiceException, SQLException {
 		List<EmployeePayrollData> employeePayrollDataList = new ArrayList<EmployeePayrollData>();
-		String query = "select * from employee_payroll";
+		String query = "select * from (employee inner join payroll on employee.PERSONAL_ID=payroll.PERSONAL_ID)";
 
 		try {
 			connection = employeePayrollService.connectingToDatabase();
@@ -108,7 +108,7 @@ public class EmployeePayrollService {
 
 	private void updateEmployeePayrollDataUsingStatement(String name, Double salary)
 			throws EmployeePayrollServiceException, SQLException {
-		String query = String.format("update emplyee_Payroll set salary=%f where name='%s'", salary, name);
+		String query = String.format("update emplyee_Payroll set NET_PAY=%f where EMP_NAME='%s'", salary, name);
 		try {
 			connection = employeePayrollService.connectingToDatabase();
 			statementOpted = connection.createStatement();
@@ -128,7 +128,7 @@ public class EmployeePayrollService {
 			throws EmployeePayrollServiceException, SQLException {
 		
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<EmployeePayrollData>();
-		String query = String.format("select * from employee_payroll where name='%s'", name);
+		String query = String.format("select * from (employee inner join payroll on employee.PERSONAL_ID=payroll.PERSONAL_ID) where EMP_NAME='%s'", name);
 		try {
 			connection = employeePayrollService.connectingToDatabase();
 			statementOpted = connection.createStatement();
@@ -155,7 +155,7 @@ public class EmployeePayrollService {
 		
 		try {
 			connection=employeePayrollService.connectingToDatabase();
-			String query="update employee_payroll set name=? where salary=? ";
+			String query="update payroll set NET_PAY=? where PERSONAL_ID =? ";
 			
 			employeePayrollService.preparedSqlStatement=connection.prepareStatement(query);
 		}catch (SQLException e) {
@@ -199,7 +199,7 @@ public class EmployeePayrollService {
 		try {
 			try {
 				connection=employeePayrollService.connectingToDatabase();
-				String query = "select * from employee_payroll where name=?";
+				String query = "select * from (employee inner join payroll on employee.PERSONAL_ID=payroll.PERSONAL_ID) where EMP_NO=?";
 				employeePayrollService.preparedSqlStatement = connection.prepareStatement(query);	
 				} catch (SQLException e) {
 				throw new EmployeePayrollServiceException("Preparation Failed.");
@@ -229,7 +229,7 @@ public class EmployeePayrollService {
 	
 	public List<EmployeePayrollData> getEmployeePayrollDataByDateOfStarting(LocalDate startDate, LocalDate endDate)
 			throws EmployeePayrollServiceException, SQLException {
-		String query = String.format("select * from employee_payroll where start between cast('%s' as date) and cast('%s' as date);",startDate, endDate);
+		String query = String.format("select * from (employee inner join payroll on employee.PERSONAL_ID=payroll.PERSONAL_ID) where start between cast('%s' as date) and cast('%s' as date);",startDate, endDate);
 		try {
 			connection=employeePayrollService.connectingToDatabase();
 			statementOpted = connection.createStatement();
@@ -249,15 +249,15 @@ public class EmployeePayrollService {
 		Double femaleCalcResult=0.0;
 		String query=null;
 		switch(calculationType) {
-		case AVG:query=String.format("select %sGENDER,%d AVG(SALARY) from employee_payroll group by gender");
+		case AVG:query=String.format("select %sGENDER,%d AVG(SALARY) from employee inner join payroll on employee.PERSONAL_ID=payroll.PERSONAL_ID  group by GENDER");
 		         break;
-		case SUM:query=String.format("select %sGENDER,%dSUM(SALARY) from employee_payroll group by gender");
+		case SUM:query=String.format("select %sGENDER,%dSUM(SALARY) from employee inner join payroll on employee.PERSONAL_ID=payroll.PERSONAL_ID  group by GENDER");
                  break;   
-		case COUNT:query=String.format("select %sGENDER,%dCOUNT(SALARY) from employee_payroll group by gender");
+		case COUNT:query=String.format("select %sGENDER,%dCOUNT(SALARY) from employee inner join payroll on employee.PERSONAL_ID=payroll.PERSONAL_ID  group by GENDER");
                  break;
-		case MIN:query=String.format("select %sGENDER,%dSUM(SALARY) from employee_payroll group by gender");
+		case MIN:query=String.format("select %sGENDER,%dSUM(SALARY) from employee inner join payroll on employee.PERSONAL_ID=payroll.PERSONAL_ID  group by GENDER");
                 break;
-		case MAX:query=String.format("select %sGENDER,%dSUM(SALARY) from employee_payroll group by gender");
+		case MAX:query=String.format("select %sGENDER,%dSUM(SALARY) from employee inner join payroll on employee.PERSONAL_ID=payroll.PERSONAL_ID  group by GENDER");
                    break;
 		}
 		try {
@@ -344,5 +344,7 @@ public class EmployeePayrollService {
  	}
  		
  }
+     
+     
    
 }
