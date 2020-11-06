@@ -2,6 +2,7 @@ package day26employeejdbcproblem.day26employeejdbc;
 
 
 
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -282,21 +283,29 @@ public class EmployeePayrollService {
 
 
      public void addEmployeeToPayrollDB(String name, String gender, Double salary, LocalDate startDate) throws EmployeePayrollServiceException, SQLException {
-    	  List<EmployeePayrollData>  employeePayrollAdditionList = new ArrayList<EmployeePayrollData>();
-    	 String query = String.format("insert into employee_payroll (NAME,GENDER,SALARY,STARTDATE) values ('%s','%s',%f,'%s')",name, gender, salary, startDate);
+    	  
+    	 String query1 = String.format("insert into employee_payroll (NAME,GENDER,SALARY,STARTDATE) values ('%s','%s',%f,'%s')",name, gender, salary, startDate);
 		try {
 			connection=employeePayrollService.connectingToDatabase();
+			connection.setAutoCommit(false);
 			statementOpted = connection.createStatement();
-			 resultSetOpted = statementOpted.executeQuery(query);			 
+			 resultSetOpted = statementOpted.executeQuery(query1);			 
 			log.info("Addition Complete");
 			Integer objectId = resultSetOpted.getInt("ID");
-			String objectName = resultSetOpted.getString("NAME");
-			String objectGender = resultSetOpted.getString("GENDER");
-			Double objectSalary = resultSetOpted.getDouble("SALARY");
-			LocalDate objectStart = resultSetOpted.getDate("START").toLocalDate();
-			employeePayrollAdditionList.add(new EmployeePayrollData(objectId, objectName, objectGender, objectSalary, objectStart));
-		} catch (SQLException e) {
-			throw new EmployeePayrollServiceException("Adding Data Failed");
+			Double BASIC_PAY = salary;
+			Double DEDUCTIONS = 0.2 * BASIC_PAY;
+			Double TAXABLE_PAY = BASIC_PAY - DEDUCTIONS;
+			Double INCOME_TAX = 0.1 * TAXABLE_PAY;
+			Double NET_PAY = BASIC_PAY - INCOME_TAX;
+			
+			String query2 = String.format("insert into payroll (ID,BASIC_PAY,DEDUCTIONS,TAXABLE_PAY,INCOME_TAX,NET_PAY) values (%s,%f,%f,%f,%f,%f)", objectId, BASIC_PAY,
+					DEDUCTIONS, TAXABLE_PAY, INCOME_TAX, NET_PAY);
+			Statement statement = connection.createStatement();
+			statement.executeQuery(query2);	
+			connection.commit();
+			
+				} catch (SQLException e) {
+			throw new EmployeePayrollServiceException("Adding Details Failed");
 		}
 		finally {
 			if (connection != null)
@@ -304,4 +313,6 @@ public class EmployeePayrollService {
 		}
 	}
 
+     
+     
 }
