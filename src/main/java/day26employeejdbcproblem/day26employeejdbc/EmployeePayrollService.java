@@ -4,6 +4,7 @@ package day26employeejdbcproblem.day26employeejdbc;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -21,12 +22,19 @@ public class EmployeePayrollService {
 	public Connection connection;
 	public Statement statementOpted;
 	public ResultSet resultSetOpted;
+	public PreparedStatement preparedSqlStatement;
+	private List<EmployeePayrollData> employeePayrollDBList;
 
 	public static void main(String[] args) throws EmployeePayrollServiceException, SQLException {
 		employeePayrollService.connectingToDatabase();
 		employeePayrollService.readEmployeePayrollData();
 		employeePayrollService.updateEmployeePayrollDataUsingStatement("SURAJ", 950000.00);
 		employeePayrollService.readEmployeePayrollDataFromDataBase("SURAJ");
+		
+		employeePayrollService.updateEmployeePayrollDataUsingPrepredStatement("SURAJ", 950000.00);
+		employeePayrollService.checkSyncWithDB("SURAJ");
+		
+		
 
 	}
 
@@ -34,7 +42,7 @@ public class EmployeePayrollService {
 
 		String jdbcurl = "jdbc:mysql://127.0.0.1:3306/payroll_service?useSSL=false";
 		String userName = "root";
-		String password = "Heybro@1234";
+		String password = "HeyBro@1234";
 		Connection connection;
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -61,7 +69,7 @@ public class EmployeePayrollService {
 		String query = "select * from employee_payroll";
 
 		try {
-			connection = this.connectingToDatabase();
+			connection = employeePayrollService.connectingToDatabase();
 			statementOpted = connection.createStatement();
 			resultSetOpted = statementOpted.executeQuery(query);
 			do {
@@ -85,12 +93,12 @@ public class EmployeePayrollService {
 
 	private void updateEmployeePayrollDataUsingStatement(String name, Double salary)
 			throws EmployeePayrollServiceException, SQLException {
-		String query = String.format("update emplyee_Payroll set salary=950000.00f where name='SURAJ'", salary, name);
+		String query = String.format("update emplyee_Payroll set salary=%f where name='%s'", salary, name);
 		try {
-			connection = this.connectingToDatabase();
+			connection = employeePayrollService.connectingToDatabase();
 			statementOpted = connection.createStatement();
-			Integer updateApplied = statementOpted.executeUpdate(query);
-			log.info(" Updations: " + updateApplied);
+			statementOpted.executeUpdate(query);
+			log.info("Updation Complete");
 		} catch (SQLException e) {
 			throw new EmployeePayrollServiceException("Updation Failed");
 
@@ -100,12 +108,14 @@ public class EmployeePayrollService {
 		}
 	}
 
+	
 	public List<EmployeePayrollData> readEmployeePayrollDataFromDataBase(String name)
 			throws EmployeePayrollServiceException, SQLException {
+		
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<EmployeePayrollData>();
 		String query = String.format("select * from employee_payroll where name='%s'", name);
 		try {
-			connection = this.connectingToDatabase();
+			connection = employeePayrollService.connectingToDatabase();
 			statementOpted = connection.createStatement();
 			resultSetOpted = statementOpted.executeQuery(query);
 			do {
@@ -126,6 +136,39 @@ public class EmployeePayrollService {
 		}
 	}
 
+	public void updateEmployeePayrollDataUsingPrepredStatement(String name, Double salary) throws EmployeePayrollServiceException, SQLException {
+		
+		try {
+			connection=employeePayrollService.connectingToDatabase();
+			String query="update employee_payroll set name=? where salary=? ";
+			
+			employeePayrollService.preparedSqlStatement=connection.prepareStatement(query);
+		}catch (SQLException e) {
+			throw new EmployeePayrollServiceException("Preparation Failed");
+		}
+		
+		try {
+			
+			preparedSqlStatement.setString(1, name);
+			preparedSqlStatement.setDouble(2, salary);
+			preparedSqlStatement.executeUpdate();
+			log.info("Updation Complete");
+		}catch(SQLException e) {
+			throw new EmployeePayrollServiceException("Preparation Failed");
+		}
+	 finally {
+		if (connection != null)
+			connection.close();
+	}
+		
+}
+	
+	public boolean checkSyncWithDB(String name) throws EmployeePayrollServiceException, SQLException {
+		List<EmployeePayrollData> employeePayrollData=employeePayrollService.employeePayrollService.readEmployeePayrollDataFromDataBase(name);
+		return employeePayrollData.get(0).equals(employeePayrollDBList.stream()
+				.filter(employeePayrollObject->employeePayrollObject.getName().equals(name))
+				.findFirst().orElse(null));
+	}
 	private static void listDrivers() {
 		Enumeration<java.sql.Driver> driverList = DriverManager.getDrivers();
 		while (driverList.hasMoreElements()) {
