@@ -65,16 +65,6 @@ public class EmployeePayrollData {
 	}
 	
 	
-	public boolean equals(Object obj) {
-		if(this.equals(obj)) return true;
-		if(obj==null||getClass()!=obj.getClass())
-			 return false;
-		EmployeePayrollData epmData=(EmployeePayrollData) obj;
-		return (id== epmData.id &&
-				Double.compare(epmData.salary, salary)==0 &&
-				name.equals(epmData.name));		
 	
-		}
-
 }
 
