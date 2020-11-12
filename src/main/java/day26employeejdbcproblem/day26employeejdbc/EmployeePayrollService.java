@@ -55,6 +55,8 @@ public class EmployeePayrollService {
 		employeePayrollService.makeComputations(TypeOfCalculation.AVG);
 		employeePayrollService.addEmployeeToPayrollDB("Capgemini","SURAJ", "M", 950000.00,startDate, "Dhanbad", "885522669933");
 		employeePayrollService.addMultipleEmployeeToPayrollDBWithoutUsingMultiThreading(threadedEmployeeList);
+		employeePayrollService.addMultipleEmployeeToPayrollDBUsingMultiThreading(threadedEmployeeList);
+
 
 	}
 
@@ -441,8 +443,8 @@ public class EmployeePayrollService {
                  employeeAddition.put(employeePayrollData.hashCode(),true); 
     		     log.info("Employee Added : "+Thread.currentThread().getName());
     		 };
-    		 Thread thread=new  Thread(employeePayrollData.name);
-    	     thread.start();
+    		 Thread thread=new  Thread(task,employeePayrollData.name);
+    	         thread.start();
     	 });
     	 while(employeeAddition.containsValue(false)) {
     		 try {
