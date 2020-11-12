@@ -31,6 +31,7 @@ public class EmployeePayrollService {
 	public  List<EmployeePayrollData> employeePayrollDBList;
 	public static List<EmployeePayrollData>threadedEmployeeList;
 	static LocalDate startDate;
+	public int connectionCounter=1;
 	
 	
 	static Double femaleResult = 0.0;
@@ -58,8 +59,8 @@ public class EmployeePayrollService {
 
 	}
 
-	public Connection connectingToDatabase() throws EmployeePayrollServiceException {
-
+	public synchronized Connection connectingToDatabase() throws EmployeePayrollServiceException {
+		connectionCounter++;
 		String jdbcurl = "jdbc:mysql://127.0.0.1:3306/payroll_service?useSSL=false";
 		String userName = "root";
 		String password = "HeyBro@1234";
@@ -74,7 +75,8 @@ public class EmployeePayrollService {
 		listDrivers();
 		try {
 			log.info("Connecting to database: " + jdbcurl);
-			connection = DriverManager.getConnection(jdbcurl, userName, password);
+			log.info("Processing Thread : "+Thread.currentThread().getName() + " Connecting to database with Id: "+ connectionCounter);
+         	connection = DriverManager.getConnection(jdbcurl, userName, password);
 			log.info("Connection is successful ");
 			return connection;
 
