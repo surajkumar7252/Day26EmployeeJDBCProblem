@@ -9,7 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.Duration;
@@ -422,6 +424,33 @@ public class EmployeePayrollService {
 				connection.close();
 		}
 	}
-   
+    
+     public void addMultipleEmployeeToPayrollDBUsingMultiThreading(List<EmployeePayrollData> employeesList) throws EmployeePayrollServiceException, SQLException {
      
+    	 Map<Integer,Boolean> employeeAddition=new HashMap<Integer,Boolean>();
+    	 employeesList.forEach(employeePayrollData ->{
+    		 Runnable task=()->{
+    			 employeeAddition.put(employeePayrollData.hashCode(),false); 
+                 System.out.println("Employee Being Added: "+Thread.currentThread().getName()); 
+                 try {
+					this.addEmployeeToPayrollDB(employeePayrollData.company, employeePayrollData.name,employeePayrollData.gender, employeePayrollData.salary, employeePayrollData.start, employeePayrollData.address, employeePayrollData.phone_number);
+				} catch (EmployeePayrollServiceException | SQLException e) {
+					
+					e.printStackTrace();
+				}
+                 employeeAddition.put(employeePayrollData.hashCode(),true); 
+    		     log.info("Employee Added : "+Thread.currentThread().getName());
+    		 };
+    		 Thread thread=new  Thread(employeePayrollData.name);
+    	     thread.start();
+    	 });
+    	 while(employeeAddition.containsValue(false)) {
+    		 try {
+    			 Thread.sleep(1000);
+    		 }catch(InterruptedException e) {
+    			 e.printStackTrace();
+    		 }
+    	 }
+       }
+    
 }

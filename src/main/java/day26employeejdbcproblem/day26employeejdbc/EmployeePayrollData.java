@@ -4,6 +4,7 @@ package day26employeejdbcproblem.day26employeejdbc;
 
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class EmployeePayrollData {
 	public  Integer id;
@@ -39,6 +40,11 @@ public class EmployeePayrollData {
 		this.start=startDate;
 		this.address=address;
 		this.phone_number=phone_number;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(company,name,gender,salary,start,address,phone_number);
 	}
 	public String getPhone_number() {
 		return phone_number;
