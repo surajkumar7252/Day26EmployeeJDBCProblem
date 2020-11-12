@@ -56,6 +56,7 @@ public class EmployeePayrollService {
 		employeePayrollService.makeComputations(TypeOfCalculation.AVG);
 		employeePayrollService.addEmployeeToPayrollDB("Capgemini","SURAJ", "M", 950000.00,startDate, "Dhanbad", "885522669933");
 		employeePayrollService.addMultipleEmployeeToPayrollDBWithoutUsingMultiThreading(threadedEmployeeList);
+		employeePayrollService.addMultipleEmployeeToPayrollDBUsingMultiThreading(threadedEmployeeList);
 
 	}
 
@@ -428,8 +429,7 @@ public class EmployeePayrollService {
 	}
     
      public void addMultipleEmployeeToPayrollDBUsingMultiThreading(List<EmployeePayrollData> employeesList) throws EmployeePayrollServiceException, SQLException {
-     
-    	 Map<Integer,Boolean> employeeAddition=new HashMap<Integer,Boolean>();
+      Map<Integer,Boolean> employeeAddition=new HashMap<Integer,Boolean>();
     	 employeesList.forEach(employeePayrollData ->{
     		 Runnable task=()->{
     			 employeeAddition.put(employeePayrollData.hashCode(),false); 
