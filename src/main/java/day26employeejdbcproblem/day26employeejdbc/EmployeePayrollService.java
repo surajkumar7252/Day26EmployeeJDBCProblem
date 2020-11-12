@@ -443,7 +443,7 @@ public class EmployeePayrollService {
                  employeeAddition.put(employeePayrollData.hashCode(),true); 
     		     log.info("Employee Added : "+Thread.currentThread().getName());
     		 };
-    		 Thread thread=new  Thread(employeePayrollData.name);
+    		 Thread thread=new  Thread(task,employeePayrollData.name);
     	     thread.start();
     	 });
     	 while(employeeAddition.containsValue(false)) {
