@@ -443,7 +443,7 @@ public class EmployeePayrollService {
                  employeeAddition.put(employeePayrollData.hashCode(),true); 
     		     log.info("Employee Added : "+Thread.currentThread().getName());
     		 };
-    		 Thread thread=new  Thread(employeePayrollData.name);
+    		 Thread thread=new  Thread(task,employeePayrollData.name);
     	     thread.start();
     	 });
     	 while(employeeAddition.containsValue(false)) {
@@ -455,4 +455,30 @@ public class EmployeePayrollService {
     	 }
        }
     
+     public void updatingDataUsingThreading(List<EmployeePayrollData> employeesList) throws EmployeePayrollServiceException, SQLException {
+         Map<Integer,Boolean> employeeAddition=new HashMap<Integer,Boolean>();
+       	 employeesList.forEach(employeePayrollData ->{
+       		 Runnable task=()->{
+       			 employeeAddition.put(employeePayrollData.hashCode(),false); 
+                    System.out.println("Employee Being Added: "+Thread.currentThread().getName()); 
+                    try {
+   					this.updateEmployeePayrollDataUsingPrepredStatement(employeePayrollData.name,employeePayrollData.salary);
+   				} catch (EmployeePayrollServiceException | SQLException e) {
+   					
+   					e.printStackTrace();
+   				}
+                    employeeAddition.put(employeePayrollData.hashCode(),true); 
+       		     log.info("Employee Updated : "+Thread.currentThread().getName());
+       		 };
+       		 Thread thread=new  Thread(task,employeePayrollData.name);
+       	     thread.start();
+       	 });
+       	 while(employeeAddition.containsValue(false)) {
+       		 try {
+       			 Thread.sleep(1000);
+       		 }catch(InterruptedException e) {
+       			 e.printStackTrace();
+       		 }
+       	 }
+          }
 }
