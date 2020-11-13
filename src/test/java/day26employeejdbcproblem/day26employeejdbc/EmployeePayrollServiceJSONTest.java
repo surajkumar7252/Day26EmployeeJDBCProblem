@@ -70,4 +70,26 @@ public class EmployeePayrollServiceJSONTest {
     	long entries=employeePayrollService.employeePayrollDBList.size();
     	Assert.assertEquals(5, entries);
     }
+    
+    @Test
+    public void multipleEmployeeDataWhenGivenInJsonServer_whenAdded_shouldMatchResponseAndCount() throws EmployeePayrollServiceException, SQLException
+    {
+    	EmployeePayrollService employeePayrollService;;
+    	EmployeePayrollData[] arrayOfEmployees = getEmployeeList();
+    	employeePayrollService=new EmployeePayrollService(Arrays.asList(arrayOfEmployees));
+    	LocalDate startDate=LocalDate.of(2017, 1, 13);
+    	EmployeePayrollData[] arrayOfEmployeePayrollData= {new EmployeePayrollData("ABC_COMPANY","PRAKASH", "M", 950000.00,startDate, "Dhanbad", "885522669933"),
+    			                                    new EmployeePayrollData("XYZ_COMPANY","Abhay", "M", 1050000.00,startDate, "Gaya", "885522600225"),
+    			                                    new EmployeePayrollData("PQR_COMPANY","Ravi", "M", 250000.00,startDate, "Dhanbad", "885522633225"),
+    			                                     };
+    	for(EmployeePayrollData employeePayrollData:arrayOfEmployeePayrollData) {
+        Response response=addNewEmployeeToJsonServer(employeePayrollData);
+    	int statusCode=response.getStatusCode();
+    	Assert.assertEquals(201, statusCode);
+    	employeePayrollData=new Gson().fromJson(response.asString(),EmployeePayrollData.class);
+    	employeePayrollService.addNewEmployeeToJsonServerUsingRestAPI(employeePayrollData);
+    	}
+    	long entries=employeePayrollService.employeePayrollDBList.size();
+    	Assert.assertEquals(8, entries);
+    }
 }
