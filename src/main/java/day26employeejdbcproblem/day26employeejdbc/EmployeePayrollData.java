@@ -42,6 +42,19 @@ public class EmployeePayrollData {
 		this.phone_number=phone_number;
 	}
 	
+	
+
+	public EmployeePayrollData(String company, String name, String gender, Double salary,
+			LocalDate startDate, String address, String phone_number) {
+		this.company=company;
+		this.name = name;
+		this.salary = salary;
+		this.gender = gender;
+		this.start=startDate;
+		this.address=address;
+		this.phone_number=phone_number;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(company,name,gender,salary,start,address,phone_number);

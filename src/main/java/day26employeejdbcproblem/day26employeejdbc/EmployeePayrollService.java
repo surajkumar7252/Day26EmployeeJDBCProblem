@@ -34,6 +34,7 @@ public class EmployeePayrollService {
 	public int connectionCounter=1;
 	
 	
+	
 	static Double femaleResult = 0.0;
 	static Double maleResult = 0.0;
 	
@@ -41,6 +42,14 @@ public class EmployeePayrollService {
 		AVG, SUM, MIN, MAX, COUNT
 	}
 	public TypeOfCalculation calcType;
+
+	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollDataList) {
+		this();
+		this.employeePayrollDBList=new ArrayList<>(employeePayrollDataList);
+	}
+	public EmployeePayrollService() {
+		employeePayrollService = new EmployeePayrollService();
+	}
 
 	public static void main(String[] args) throws EmployeePayrollServiceException, SQLException {
 		employeePayrollService.connectingToDatabase();
@@ -481,4 +490,10 @@ public class EmployeePayrollService {
        		 }
        	 }
           }
+	public void addNewEmployeeToJsonServerUsingRestAPI(EmployeePayrollData employeePayrollData) throws EmployeePayrollServiceException, SQLException {
+		this.addEmployeeToPayrollDB(employeePayrollData.company,employeePayrollData.name, employeePayrollData.gender,employeePayrollData.salary, employeePayrollData.start,employeePayrollData.address,employeePayrollData.phone_number);
+		
+	}
+     
+     
 }
