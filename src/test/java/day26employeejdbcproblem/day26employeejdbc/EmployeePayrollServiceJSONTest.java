@@ -110,4 +110,22 @@ public class EmployeePayrollServiceJSONTest {
     	Assert.assertEquals(200, statusCode);
     	
     }
+    
+    @Test
+    public void employeeToDeleteWhenSaid_shouldMatch200ResponseAndCount() throws EmployeePayrollServiceException, SQLException
+    {
+    	EmployeePayrollService employeePayrollService;;
+    	EmployeePayrollData[] arrayOfEmployees = getEmployeeList();
+    	employeePayrollService=new EmployeePayrollService(Arrays.asList(arrayOfEmployees));
+    	EmployeePayrollData employeePayrollData= (EmployeePayrollData) employeePayrollService.readEmployeePayrollDataFromDataBase("PRAKASH");
+    	RequestSpecification request=RestAssured.given();
+		request.header("Content-Type","application/json");
+		 Response response=request.delete("/employee_payroll/"+employeePayrollData.id);
+		int statusCode=response.getStatusCode();
+    	Assert.assertEquals(200, statusCode);
+    	employeePayrollService.deleteEmployeeDetails(employeePayrollData.name); 
+    	 
+    	long entries=employeePayrollService.employeePayrollDBList.size();
+    	Assert.assertEquals(7, entries);
+    }
 }
