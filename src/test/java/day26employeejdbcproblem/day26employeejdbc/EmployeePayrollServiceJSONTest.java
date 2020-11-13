@@ -92,4 +92,22 @@ public class EmployeePayrollServiceJSONTest {
     	long entries=employeePayrollService.employeePayrollDBList.size();
     	Assert.assertEquals(8, entries);
     }
+    @Test
+    public void newSalaryWhenGivenForEmployee_whenUpdated_shouldMatch200Response() throws EmployeePayrollServiceException, SQLException
+    {
+    	EmployeePayrollService employeePayrollService;;
+    	EmployeePayrollData[] arrayOfEmployees = getEmployeeList();
+    	employeePayrollService=new EmployeePayrollService(Arrays.asList(arrayOfEmployees));
+    	LocalDate startDate=LocalDate.of(2017, 1, 13);
+    	employeePayrollService.updateEmployeePayrollDataUsingStatement("PRAKASH",54321000.00);
+    	EmployeePayrollData employeePayrollData= (EmployeePayrollData) employeePayrollService.readEmployeePayrollDataFromDataBase("PRAKASH");
+         String empJson=new Gson().toJson(employeePayrollData);
+		RequestSpecification request=RestAssured.given();
+		request.header("Content-Type","application/json");
+		request.body(empJson);
+	    Response response=request.put("/employee_payroll/"+employeePayrollData.id);
+	     int statusCode=response.getStatusCode();
+    	Assert.assertEquals(200, statusCode);
+    	
+    }
 }

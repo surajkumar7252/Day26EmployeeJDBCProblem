@@ -123,7 +123,7 @@ public class EmployeePayrollService {
 
 	}
 
-	private void updateEmployeePayrollDataUsingStatement(String name, Double salary)
+	public void updateEmployeePayrollDataUsingStatement(String name, Double salary)
 			throws EmployeePayrollServiceException, SQLException {
 		String query = String.format("update emplyee_Payroll set NET_PAY=%f where EMP_NAME='%s'", salary, name);
 		try {
